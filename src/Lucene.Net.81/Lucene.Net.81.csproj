@@ -251,6 +251,11 @@
     <Compile Include="Codecs\TermVectorsFormat.cs" />
     <Compile Include="Codecs\TermVectorsReader.cs" />
     <Compile Include="Codecs\TermVectorsWriter.cs" />
+    <Compile Include="Collections\ArrayList.cs" />
+    <Compile Include="Collections\Hashtable.cs" />
+    <Compile Include="Collections\ICloneable.cs" />
+    <Compile Include="Collections\IOrderedDictionary.cs" />
+    <Compile Include="Collections\OrderedDictionary.cs" />
     <Compile Include="Document\BinaryDocValuesField.cs" />
     <Compile Include="Document\ByteDocValuesField.cs" />
     <Compile Include="Document\CompressionTools.cs" />
@@ -626,7 +631,6 @@
     <Compile Include="Store\LockStressTest.cs" />
     <Compile Include="Store\LockVerifyServer.cs" />
     <Compile Include="Store\MergeInfo.cs" />
-    <Compile Include="Store\MMapDirectory.cs" />
     <Compile Include="Store\NativeFSLockFactory.cs" />
     <Compile Include="Store\NIOFSDirectory.cs" />
     <Compile Include="Store\NoLockFactory.cs" />

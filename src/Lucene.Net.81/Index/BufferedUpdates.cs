@@ -4,6 +4,7 @@ using System.Collections.Specialized;
 
 namespace Lucene.Net.Index
 {
+    using Lucene.Net._81.Collections;
     using Lucene.Net.Support;
 
     /*
