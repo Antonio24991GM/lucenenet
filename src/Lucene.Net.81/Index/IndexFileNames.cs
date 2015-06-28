@@ -244,6 +244,6 @@ namespace Lucene.Net.Index
         /// All files created by codecs much match this pattern (checked in
         /// SegmentInfo).
         /// </summary>
-        public static readonly Regex CODEC_FILE_PATTERN = new Regex("_[a-z0-9]+(_.*)?\\..*", RegexOptions.Compiled);
+        public static readonly Regex CODEC_FILE_PATTERN = new Regex("_[a-z0-9]+(_.*)?\\..*");
     }
 }

@@ -134,7 +134,7 @@ namespace Lucene.Net.Search
         {
             get
             {
-                return termArrays.AsReadOnly();// Collections.unmodifiableList(TermArrays_Renamed);
+                return termArrays;// Collections.unmodifiableList(TermArrays_Renamed);
             }
         }
 
