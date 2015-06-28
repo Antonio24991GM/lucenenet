@@ -7,6 +7,9 @@ namespace Lucene.Net.Util
     using System.Diagnostics;
     using System.IO;
     using System.Text;
+    using Windows.Storage;
+    using Windows.Storage.Streams;
+    using System.Reflection;
 
     /*
                      * Licensed to the Apache Software Foundation (ASF) under one or more
@@ -26,6 +29,8 @@ namespace Lucene.Net.Util
                      */
 
     using Directory = Lucene.Net.Store.Directory;
+    using System.Threading.Tasks;
+
 
     /// <summary>
     /// this class emulates the new Java 7 "Try-With-Resources" statement.
@@ -287,8 +292,8 @@ namespace Lucene.Net.Util
         /// <param name="charSet"> the expected charset </param>
         /// <returns> a wrapping reader </returns>
         public static TextReader GetDecodingReader(Stream stream, Encoding charSet)
-        {
-            return new StreamReader(new BufferedStream(stream), charSet);
+        {            
+            return new StreamReader(stream, charSet);
         }
 
         /// <summary>
@@ -302,13 +307,14 @@ namespace Lucene.Net.Util
         /// <param name="file"> the file to open a reader on </param>
         /// <param name="charSet"> the expected charset </param>
         /// <returns> a reader to read the given file </returns>
-        public static TextReader GetDecodingReader(FileInfo file, Encoding charSet)
+        public async static Task<TextReader> GetDecodingReader(StorageFile file, Encoding charSet)
         {
-            FileStream stream = null;
+            Stream stream = null;
             bool success = false;
             try
             {
-                stream = file.OpenRead();
+                IRandomAccessStream irs = await file.OpenAsync(FileAccessMode.Read);
+                stream = irs.AsStream();
                 TextReader reader = GetDecodingReader(stream, charSet);
                 success = true;
                 return reader;
@@ -341,7 +347,7 @@ namespace Lucene.Net.Util
             bool success = false;
             try
             {
-                stream = clazz.Assembly.GetManifestResourceStream(resource);
+                stream = clazz.GetTypeInfo().Assembly.GetManifestResourceStream(resource);
                 TextReader reader = GetDecodingReader(stream, charSet);
                 success = true;
                 return reader;
@@ -379,14 +385,16 @@ namespace Lucene.Net.Util
         /// Copy one file's contents to another file. The target will be overwritten
         /// if it exists. The source must exist.
         /// </summary>
-        public static void Copy(FileInfo source, FileInfo target)
+        public async static void Copy(StorageFile source, StorageFile target)
         {
-            FileStream fis = null;
-            FileStream fos = null;
+            Stream fis = null;
+            Stream fos = null;
             try
             {
-                fis = source.OpenRead();
-                fos = target.OpenWrite();
+                IRandomAccessStream irs = await source.OpenAsync(FileAccessMode.Read);
+                fis = irs.AsStream();
+                IRandomAccessStream irss = await target.OpenAsync(FileAccessMode.ReadWrite);
+                fos = irss.AsStream();
 
                 byte[] buffer = new byte[1024 * 8];
                 int len;
@@ -437,7 +445,7 @@ namespace Lucene.Net.Util
         /// <param name="fileToSync"> the file to fsync </param>
         /// <param name="isDir"> if true, the given file is a directory (we open for read and ignore IOExceptions,
         ///  because not all file systems and operating systems allow to fsync on a directory) </param>
-        public static void Fsync(string fileToSync, bool isDir)
+        public async static void Fsync(string fileToSync, bool isDir)
         {
             // Fsync does not appear to function properly for Windows and Linux platforms. In Lucene version
             // they catch this in IOException branch and return if the call is for the directory. 
@@ -451,20 +459,26 @@ namespace Lucene.Net.Util
             var retryCount = 1;
             while (true)
             {
-                FileStream file = null;
+                Stream file = null;
                 bool success = false;
                 try
                 {
                     // If the file is a directory we have to open read-only, for regular files we must open r/w for the fsync to have an effect.
                     // See http://blog.httrack.com/blog/2013/11/15/everything-you-always-wanted-to-know-about-fsync/
-                    file = new FileStream(fileToSync,
-                        FileMode.Open, // We shouldn't create a file when syncing.
-                        // Java version uses FileChannel which doesn't create the file if it doesn't already exist, 
-                        // so there should be no reason for attempting to create it in Lucene.Net.
-                        FileAccess.Write,
-                        FileShare.ReadWrite);
-                    //FileSupport.Sync(file);
-                    file.Flush(true);
+                    //file = new FileStream(fileToSync,
+                    //    FileMode.Open, // We shouldn't create a file when syncing.
+                    //    // Java version uses FileChannel which doesn't create the file if it doesn't already exist, 
+                    //    // so there should be no reason for attempting to create it in Lucene.Net.
+                    //    FileAccess.Write,
+                    //    FileShare.ReadWrite);
+                    ////FileSupport.Sync(file);
+                    //file.Flush(true);
+                    StorageFile fs = await StorageFile.GetFileFromPathAsync(fileToSync);
+                    if (file != null)
+                    {
+                        IRandomAccessStream stream = await fs.OpenAsync(FileAccessMode.ReadWrite);
+                        file = stream.AsStream();
+                    }
                     success = true;
                 }
                 catch (IOException e)
@@ -474,8 +488,7 @@ namespace Lucene.Net.Util
                         throw;
                     }
 
-                    // Pause 5 msec
-                    Thread.Sleep(5);
+                    await System.Threading.Tasks.Task.Delay(5);
                 }
                 finally
                 {

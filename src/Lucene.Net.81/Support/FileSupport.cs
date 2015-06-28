@@ -34,26 +34,26 @@ namespace Lucene.Net.Support
         /// </summary>
         /// <param name="path">The abstract pathname to list it childs.</param>
         /// <returns>An array of abstract pathnames childs of the path specified or null if the path is not a directory</returns>
-        public static System.IO.FileInfo[] GetFiles(System.IO.FileInfo path)
-        {
-            if ((path.Attributes & FileAttributes.Directory) > 0)
-            {
-                String[] fullpathnames = Directory.GetFileSystemEntries(path.FullName);
-                System.IO.FileInfo[] result = new System.IO.FileInfo[fullpathnames.Length];
-                for (int i = 0; i < result.Length; i++)
-                    result[i] = new System.IO.FileInfo(fullpathnames[i]);
-                return result;
-            }
-            else
-                return null;
-        }
+        //public static System.IO.FileInfo[] GetFiles(System.IO.FileInfo path)
+        //{
+        //    if ((path.Attributes & FileAttributes.Directory) > 0)
+        //    {
+        //        String[] fullpathnames = Directory.GetFileSystemEntries(path.FullName);
+        //        System.IO.FileInfo[] result = new System.IO.FileInfo[fullpathnames.Length];
+        //        for (int i = 0; i < result.Length; i++)
+        //            result[i] = new System.IO.FileInfo(fullpathnames[i]);
+        //        return result;
+        //    }
+        //    else
+        //        return null;
+        //}
 
         // TODO: This filesupport thing is silly.  Same goes with _TestUtil's RMDir.
         //       If we're removing a directory
-        public static System.IO.FileInfo[] GetFiles(System.IO.DirectoryInfo path)
-        {
-            return GetFiles(new FileInfo(path.FullName));
-        }
+        //public static System.IO.FileInfo[] GetFiles(System.IO.DirectoryInfo path)
+        //{
+        //    return GetFiles(new FileInfo(path.FullName));
+        //}
 
         ///// <summary>
         ///// Returns a list of files in a give directory.
@@ -87,28 +87,28 @@ namespace Lucene.Net.Support
         /// data is actually written to the file system.
         /// </summary>
         /// <param name="fileStream">The file stream.</param>
-        public static void Sync(System.IO.FileStream fileStream)
-        {
-            if (fileStream == null)
-                throw new ArgumentNullException("fileStream");
+        //public static void Sync(System.IO.FileStream fileStream)
+        //{
+        //    if (fileStream == null)
+        //        throw new ArgumentNullException("fileStream");
 
-            fileStream.Flush(true);
+        //    fileStream.Flush(true);
 
-            if (OS.IsWindows)
-            {
-                if (!FlushFileBuffers(fileStream.Handle))
-                    throw new IOException();
-            }
-            //else if (OS.IsUnix)
-            //{
-            //    if (fsync(fileStream.Handle) != IntPtr.Zero)
-            //    throw new System.IO.IOException();
-            //}
-            //else
-            //{
-            //    throw new NotImplementedException();
-            //}
-        }
+        //    if (OS.IsWindows)
+        //    {
+        //        if (!FlushFileBuffers(fileStream.Handle))
+        //            throw new IOException();
+        //    }
+        //    //else if (OS.IsUnix)
+        //    //{
+        //    //    if (fsync(fileStream.Handle) != IntPtr.Zero)
+        //    //    throw new System.IO.IOException();
+        //    //}
+        //    //else
+        //    //{
+        //    //    throw new NotImplementedException();
+        //    //}
+        //}
 
 #pragma warning restore 618
 

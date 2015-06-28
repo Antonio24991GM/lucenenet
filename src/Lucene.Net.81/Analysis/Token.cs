@@ -652,7 +652,7 @@ namespace Lucene.Net.Analysis
             public override Attribute CreateAttributeInstance<T>()
             {
                 var attClass = typeof(T);
-                return attClass.GetType().GetTypeInfo().IsSubclassOf(typeof(Token)) ? new Token() : @delegate.CreateAttributeInstance<T>();
+                return attClass.GetTypeInfo().IsSubclassOf(typeof(Token)) ? new Token() : @delegate.CreateAttributeInstance<T>();
             }
 
             public override bool Equals(object other)
