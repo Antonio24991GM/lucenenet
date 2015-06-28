@@ -257,6 +257,8 @@
     <Compile Include="Collections\IHashCodeProvider.cs" />
     <Compile Include="Collections\IOrderedDictionary.cs" />
     <Compile Include="Collections\OrderedDictionary.cs" />
+    <Compile Include="Cryptography\HasAlgorithm.cs" />
+    <Compile Include="Cryptography\ICryptoTransform.cs" />
     <Compile Include="Document\BinaryDocValuesField.cs" />
     <Compile Include="Document\ByteDocValuesField.cs" />
     <Compile Include="Document\CompressionTools.cs" />

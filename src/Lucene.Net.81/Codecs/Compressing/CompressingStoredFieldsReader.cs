@@ -199,7 +199,7 @@ namespace Lucene.Net.Codecs.Compressing
                     length = @in.ReadVInt();
                     data = new byte[length];
                     @in.ReadBytes(data, 0, length);
-                    visitor.StringField(info, IOUtils.CHARSET_UTF_8.GetString((byte[])(Array)data));
+                    visitor.StringField(info, IOUtils.CHARSET_UTF_8.GetString(((byte[])(Array)data), 0, data.Length));
                     break;
 
                 case CompressingStoredFieldsWriter.NUMERIC_INT:

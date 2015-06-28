@@ -127,9 +127,10 @@ namespace Lucene.Net._81.Collections
 
         public Hashtable(IDictionary d, IEqualityComparer equalityComparer) : this(d, 1.0f, equalityComparer)
         {
+            this.equalityComparer = equalityComparer;
         }
 
-        public Hashtable(IDictionary d, float loadFactor, IEqualityComparer equalityComparer) : this(d, loadFactor)
+        public Hashtable(IDictionary d, float loadFactor, IEqualityComparer equalityComparer)
         {
             this.equalityComparer = equalityComparer;
         }
@@ -142,7 +143,7 @@ namespace Lucene.Net._81.Collections
         {
         }
 
-        public Hashtable(int capacity, float loadFactor, IEqualityComparer equalityComparer) : this(capacity, loadFactor)
+        public Hashtable(int capacity, float loadFactor, IEqualityComparer equalityComparer)
         {
             this.equalityComparer = equalityComparer;
         }

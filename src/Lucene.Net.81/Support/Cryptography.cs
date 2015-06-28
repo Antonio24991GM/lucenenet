@@ -19,7 +19,7 @@
  *
 */
 
-using System.Security.Cryptography;
+using Lucene.Net._81.Cryptography;
 
 namespace Lucene.Net.Support
 {
@@ -27,18 +27,11 @@ namespace Lucene.Net.Support
     {
         public static bool FIPSCompliant = false;
 
-        public static HashAlgorithm HashAlgorithm
+        public static bool HashAlgorithm
         {
             get
             {
-                if (FIPSCompliant)
-                {
-                    //LUCENENET-175
-                    //No Assumptions should be made on the HashAlgorithm. It may change in time.
-                    //SHA256 SHA384 SHA512 etc.
-                    return SHA1.Create();
-                }
-                return MD5.Create();
+                return true;
             }
         }
     }
