@@ -7,22 +7,23 @@ using System.Text;
 
 namespace Lucene.Net.Util
 {
+    using System.Reflection;
     /*
-     * Licensed to the Apache Software Foundation (ASF) under one or more
-     * contributor license agreements.  See the NOTICE file distributed with
-     * this work for additional information regarding copyright ownership.
-     * The ASF licenses this file to You under the Apache License, Version 2.0
-     * (the "License"); you may not use this file except in compliance with
-     * the License.  You may obtain a copy of the License at
-     *
-     *     http://www.apache.org/licenses/LICENSE-2.0
-     *
-     * Unless required by applicable law or agreed to in writing, software
-     * distributed under the License is distributed on an "AS IS" BASIS,
-     * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-     * See the License for the specific language governing permissions and
-     * limitations under the License.
-     */
+* Licensed to the Apache Software Foundation (ASF) under one or more
+* contributor license agreements.  See the NOTICE file distributed with
+* this work for additional information regarding copyright ownership.
+* The ASF licenses this file to You under the Apache License, Version 2.0
+* (the "License"); you may not use this file except in compliance with
+* the License.  You may obtain a copy of the License at
+*
+*     http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 
     using System.Runtime.CompilerServices;
 
@@ -86,7 +87,7 @@ namespace Lucene.Net.Util
                         // we have the slight chance that another thread may do the same, but who cares?
                         try
                         {
-                            string name = attClass.FullName.Replace(attClass.Name, attClass.Name.Substring(1)) + ", " + attClass.Assembly.FullName;
+                            string name = attClass.FullName.Replace(attClass.Name, attClass.Name.Substring(1)) + ", " + attClass.GetTypeInfo().Assembly.FullName;
                             AttClassImplMap.Add(attClass, new WeakReference(clazz = Type.GetType(name, true)));
                         }
                         catch (Exception)
@@ -283,14 +284,14 @@ namespace Lucene.Net.Util
                     Type actClazz = clazz;
                     do
                     {
-                        foreach (Type curInterface in actClazz.GetInterfaces())
+                        foreach (Type curInterface in actClazz.GetTypeInfo().ImplementedInterfaces)
                         {
-                            if (curInterface != typeof(IAttribute) && (typeof(IAttribute)).IsAssignableFrom(curInterface))
+                            if (curInterface != typeof(IAttribute) && (typeof(IAttribute)).GetTypeInfo().IsAssignableFrom(curInterface.GetTypeInfo()))
                             {
                                 foundInterfaces.AddLast(new WeakReference(curInterface));
                             }
                         }
-                        actClazz = actClazz.BaseType;
+                        actClazz = actClazz.GetTypeInfo().BaseType;
                     } while (actClazz != null);
                     KnownImplClasses[clazz] = foundInterfaces;
                 }
@@ -342,7 +343,7 @@ namespace Lucene.Net.Util
             var attClass = typeof(T);
             if (!Attributes.ContainsKey(attClass))
             {
-                if (!(attClass.IsInterface && typeof(IAttribute).IsAssignableFrom(attClass)))
+                if (!(attClass.GetTypeInfo().IsInterface && typeof(IAttribute).GetTypeInfo().IsAssignableFrom(attClass.GetTypeInfo())))
                 {
                     throw new ArgumentException("AddAttribute() only accepts an interface that extends IAttribute, but " + attClass.FullName + " does not fulfil this contract.");
                 }

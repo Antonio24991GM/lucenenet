@@ -102,7 +102,8 @@ namespace Lucene.Net.Util
 
             //problem: the interfaces list has weak references that could have expired already
 
-            FieldInfo[] fields = clazz.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
+            FieldInfo[] fields = clazz.GetTypeInfo().DeclaredFields.Where(x => x.IsPublic || x.IsPrivate || x.IsInitOnly || x.IsLiteral).ToArray();
+            //GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
             try
             {
                 for (int i = 0; i < fields.Length; i++)
@@ -133,7 +134,8 @@ namespace Lucene.Net.Util
         {
             System.Text.StringBuilder buffer = new System.Text.StringBuilder();
             System.Type clazz = this.GetType();
-            System.Reflection.FieldInfo[] fields = clazz.GetFields(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.DeclaredOnly | System.Reflection.BindingFlags.Static);
+            System.Reflection.FieldInfo[] fields = clazz.GetTypeInfo().DeclaredFields.Where(x => x.IsPublic || x.IsPrivate || x.IsInitOnly || x.IsLiteral || x.IsStatic).ToArray();
+            //clazz.GetFields(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.DeclaredOnly | System.Reflection.BindingFlags.Static);
             try
             {
                 for (int i = 0; i < fields.Length; i++)
@@ -161,7 +163,7 @@ namespace Lucene.Net.Util
             {
                 // this should never happen, because we're just accessing fields
                 // from 'this'
-                throw new System.SystemException(e.Message, e);
+                throw new System.Exception(e.Message, e);
             }
 
             return buffer.ToString();
@@ -185,7 +187,7 @@ namespace Lucene.Net.Util
             }
             catch (System.Exception e)
             {
-                throw new System.SystemException(e.Message, e); // shouldn't happen
+                throw new System.Exception(e.Message, e); // shouldn't happen
             }
             return clone;
         }

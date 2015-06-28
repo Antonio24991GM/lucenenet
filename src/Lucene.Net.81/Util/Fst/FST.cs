@@ -560,10 +560,11 @@ namespace Lucene.Net.Util.Fst
         /// <summary>
         /// Writes an automaton to a file.
         /// </summary>
-        public void Save(FileInfo file)
+        public async void Save(Windows.Storage.StorageFile file)
         {
             bool success = false;
-            var bs = new BufferedStream(file.OpenWrite());
+            var irs = await file.OpenAsync(Windows.Storage.FileAccessMode.ReadWrite);
+            var bs = irs.AsStream();
             try
             {
                 Save(new OutputStreamDataOutput(bs));
@@ -585,9 +586,12 @@ namespace Lucene.Net.Util.Fst
         /// <summary>
         /// Reads an automaton from a file.
         /// </summary>
-        public static FST<T> Read<T>(FileInfo file, Outputs<T> outputs)
+        public static FST<T> Read<T>(Windows.Storage.StorageFile file, Outputs<T> outputs)
         {
-            var bs = new BufferedStream(file.OpenRead());
+            var task = file.OpenAsync(Windows.Storage.FileAccessMode.ReadWrite).AsTask();
+            task.Wait();
+            var irs = task.Result;
+            var bs = irs.AsStream();
             bool success = false;
             try
             {

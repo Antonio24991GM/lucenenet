@@ -20,7 +20,8 @@
 */
 
 using System;
-using System.Configuration;
+using Windows.Foundation.Collections;
+using Windows.Storage;
 
 namespace Lucene.Net.Support
 {
@@ -29,8 +30,8 @@ namespace Lucene.Net.Support
     /// </summary>
     public class AppSettings
     {
-        private static System.Collections.Specialized.ListDictionary settings = new System.Collections.Specialized.ListDictionary();
-
+        //private static System.Collections.Specialized.ListDictionary settings = new System.Collections.Specialized.ListDictionary();
+        static IPropertySet settings = ApplicationData.Current.LocalSettings.Values;
         /// <summary>
         ///
         /// </summary>
@@ -38,6 +39,7 @@ namespace Lucene.Net.Support
         /// <param name="defValue"></param>
         public static void Set(System.String key, int defValue)
         {
+           
             settings[key] = defValue;
         }
 
@@ -83,8 +85,7 @@ namespace Lucene.Net.Support
             {
                 return (int)settings[key];
             }
-
-            System.String theValue = ConfigurationManager.AppSettings.Get(key);
+            string theValue = (string)settings[key];
             if (theValue == null)
             {
                 return defValue;
@@ -107,7 +108,7 @@ namespace Lucene.Net.Support
                 return (long)settings[key];
             }
 
-            System.String theValue = ConfigurationManager.AppSettings.Get(key);
+            System.String theValue = (string)settings[key];
             if (theValue == null)
             {
                 return defValue;
@@ -130,7 +131,7 @@ namespace Lucene.Net.Support
                 return (System.String)settings[key];
             }
 
-            System.String theValue = ConfigurationManager.AppSettings.Get(key);
+            System.String theValue = (string)settings[key];
             if (theValue == null)
             {
                 return defValue;
@@ -146,7 +147,7 @@ namespace Lucene.Net.Support
                 return (bool)settings[key];
             }
 
-            System.String theValue = ConfigurationManager.AppSettings.Get(key);
+            System.String theValue = (string)settings[key];
             if (theValue == null)
             {
                 return defValue;
