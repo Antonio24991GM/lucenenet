@@ -6,6 +6,8 @@ using Lucene.Net.Util;
 namespace Lucene.Net.Store
 {
     using System.IO;
+    using Windows.Storage;
+
 
     /*
                  * Licensed to the Apache Software Foundation (ASF) under one or more
@@ -72,7 +74,7 @@ namespace Lucene.Net.Store
         /// your create!
         /// </summary>
         public NativeFSLockFactory()
-            : this((DirectoryInfo)null)
+            : this((string)null)
         {
         }
 
@@ -82,19 +84,21 @@ namespace Lucene.Net.Store
         /// </summary>
         /// <param name="lockDirName"> where lock files are created. </param>
         public NativeFSLockFactory(string lockDirName)
-            : this(new DirectoryInfo(lockDirName))
         {
+            var task = ApplicationData.Current.LocalFolder.CreateFolderAsync(lockDirName).AsTask();
+            task.Wait();       
+            LockDir = task.Result;
         }
 
-        /// <summary>
-        /// Create a NativeFSLockFactory instance, storing lock
-        /// files into the specified lockDir:
-        /// </summary>
-        /// <param name="lockDir"> where lock files are created. </param>
-        public NativeFSLockFactory(DirectoryInfo lockDir)
-        {
-            LockDir = lockDir;
-        }
+        ///// <summary>
+        ///// Create a NativeFSLockFactory instance, storing lock
+        ///// files into the specified lockDir:
+        ///// </summary>
+        ///// <param name="lockDir"> where lock files are created. </param>
+        //public NativeFSLockFactory(string lockDir)
+        //{
+            
+        //}
 
         // LUCENENET NativeFSLocks in Java are infact singletons; this is how we mimick that to track instances and make sure
         // IW.Unlock and IW.IsLocked works correctly
@@ -118,16 +122,18 @@ namespace Lucene.Net.Store
 
     internal class NativeFSLock : Lock
     {
-        private FileStream Channel;
-        private readonly DirectoryInfo Path;
+        private Stream Channel;
+        private readonly StorageFile Path;
         private readonly NativeFSLockFactory _creatingInstance;
-        private readonly DirectoryInfo LockDir;
+        private readonly StorageFolder LockDir;
 
-        public NativeFSLock(NativeFSLockFactory creatingInstance, DirectoryInfo lockDir, string lockFileName)
+        public NativeFSLock(NativeFSLockFactory creatingInstance, StorageFolder lockDir, string lockFileName)
         {
             _creatingInstance = creatingInstance;
             this.LockDir = lockDir;
-            Path = new DirectoryInfo(System.IO.Path.Combine(lockDir.FullName, lockFileName));
+            var task = LockDir.CreateFileAsync(lockFileName).AsTask();
+            task.Wait();
+            Path = task.Result;
         }
 
         public override bool Obtain()
@@ -141,28 +147,14 @@ namespace Lucene.Net.Store
                     // Our instance is already locked:
                     return false;
                 }
-
-                if (!System.IO.Directory.Exists(LockDir.FullName))
-                {
-                    try
-                    {
-                        System.IO.Directory.CreateDirectory(LockDir.FullName);
-                    }
-                    catch
-                    {
-                        throw new System.IO.IOException("Cannot create directory: " + LockDir.FullName);
-                    }
-                }
-                else if (File.Exists(LockDir.FullName))
-                {
-                    throw new IOException("Found regular file where directory expected: " + LockDir.FullName);
-                }
-
                 var success = false;
                 try
                 {
-                    Channel = new FileStream(Path.FullName, FileMode.Create, FileAccess.Write, FileShare.None);
-                    Channel.Lock(0, Channel.Length);
+                    var task = Path.OpenAsync(FileAccessMode.ReadWrite).AsTask();
+                    task.Wait();                    
+                    Channel = task.Result.AsStream();
+                    //I cant look this stream is posible an error on ejecution
+                    //Channel. Lock(0, Channel.Length);
                     success = true;
                 }
                 catch (IOException e)
@@ -203,10 +195,10 @@ namespace Lucene.Net.Store
                 {
                     try
                     {
-                        Channel.Unlock(0, Channel.Length);
+                        Channel.Dispose();
 
                         NativeFSLock _;
-                        _creatingInstance._locks.TryRemove(Path.FullName, out _);
+                        _creatingInstance._locks.TryRemove(Path.Path, out _);
                     }
                     finally
                     {
@@ -215,16 +207,16 @@ namespace Lucene.Net.Store
                     }
 
                     bool tmpBool;
-                    if (File.Exists(Path.FullName))
+                    if (Path!=null)
                     {
-                        File.Delete(Path.FullName);
+                        Path.DeleteAsync().AsTask().Wait();
                         tmpBool = true;
                     }
-                    else if (System.IO.Directory.Exists(Path.FullName))
-                    {
-                        System.IO.Directory.Delete(Path.FullName);
-                        tmpBool = true;
-                    }
+                    //else if (System.IO.Directory.Exists(Path.FullName))
+                    //{
+                    //    System.IO.Directory.Delete(Path.FullName);
+                    //    tmpBool = true;
+                    //}
                     else
                     {
                         tmpBool = false;
@@ -253,10 +245,10 @@ namespace Lucene.Net.Store
 
                     // Look if lock file is present; if not, there can definitely be no lock!
                     bool tmpBool;
-                    if (System.IO.File.Exists(Path.FullName))
+                    if (Path!=null)
                         tmpBool = true;
                     else
-                        tmpBool = System.IO.Directory.Exists(Path.FullName);
+                        tmpBool = false;
                     if (!tmpBool)
                         return false;
 

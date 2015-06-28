@@ -78,26 +78,34 @@ namespace Lucene.Net.Store
         public override IndexInput OpenInput(string name, IOContext context)
         {
             EnsureOpen();
-            var path = new FileInfo(Path.Combine(Directory.FullName, name));
-            var fc = new FileStream(path.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
+            var task = Directory.CreateFileAsync(name).AsTask();
+            task.Wait();
+            var path = task.Result;
+            var taskirs = path.OpenAsync(FileAccessMode.ReadWrite).AsTask();
+            taskirs.Wait();
+            var fc = taskirs.Result.AsStream();
             return new NIOFSIndexInput("NIOFSIndexInput(path=\"" + path + "\")", fc, context);
         }
 
         public override IndexInputSlicer CreateSlicer(string name, IOContext context)
         {
             EnsureOpen();
-            var path = new FileInfo(Path.Combine(Directory.FullName, name));
-            var fc = new FileStream(path.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
+            var task = Directory.CreateFileAsync(name).AsTask();
+            task.Wait();
+            var path = task.Result;
+            var taskirs = path.OpenAsync(FileAccessMode.ReadWrite).AsTask();
+            taskirs.Wait();
+            var fc = taskirs.Result.AsStream();
             return new IndexInputSlicerAnonymousInnerClassHelper(this, context, path, fc);
         }
 
         private class IndexInputSlicerAnonymousInnerClassHelper : IndexInputSlicer
         {
             private readonly IOContext Context;
-            private readonly FileInfo Path;
-            private readonly FileStream Descriptor;
+            private readonly StorageFile Path;
+            private readonly Stream Descriptor;
 
-            public IndexInputSlicerAnonymousInnerClassHelper(NIOFSDirectory outerInstance, IOContext context, FileInfo path, FileStream descriptor)
+            public IndexInputSlicerAnonymousInnerClassHelper(NIOFSDirectory outerInstance, IOContext context, StorageFile path, Stream descriptor)
                 : base(outerInstance)
             {
                 this.Context = context;
@@ -109,7 +117,7 @@ namespace Lucene.Net.Store
             {
                 if (disposing)
                 {
-                    Descriptor.Close();
+                    Descriptor.Dispose();
                 }
             }
 
@@ -143,7 +151,7 @@ namespace Lucene.Net.Store
 
             /// <summary>
             /// the file channel we will read from </summary>
-            protected internal readonly FileStream Channel;
+            protected internal readonly Stream Channel;
 
             /// <summary>
             /// is this instance a clone and hence does not own the file to close it </summary>
@@ -159,7 +167,7 @@ namespace Lucene.Net.Store
 
             internal ByteBuffer ByteBuf; // wraps the buffer for NIO
 
-            public NIOFSIndexInput(string resourceDesc, FileStream fc, IOContext context)
+            public NIOFSIndexInput(string resourceDesc, Stream fc, IOContext context)
                 : base(resourceDesc, context)
             {
                 this.Channel = fc;
@@ -167,7 +175,7 @@ namespace Lucene.Net.Store
                 this.End = fc.Length;
             }
 
-            public NIOFSIndexInput(string resourceDesc, FileStream fc, long off, long length, int bufferSize)
+            public NIOFSIndexInput(string resourceDesc, Stream fc, long off, long length, int bufferSize)
                 : base(resourceDesc, bufferSize)
             {
                 this.Channel = fc;
@@ -180,7 +188,7 @@ namespace Lucene.Net.Store
             {
                 if (!IsClone)
                 {
-                    Channel.Close();
+                    Channel.Dispose();
                 }
             }
 

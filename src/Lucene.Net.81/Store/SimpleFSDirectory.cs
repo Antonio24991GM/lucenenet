@@ -59,26 +59,34 @@ namespace Lucene.Net.Store
         public override IndexInput OpenInput(string name, IOContext context)
         {
             EnsureOpen();
-            var path = new FileInfo(Path.Combine(Directory.FullName, name));
-            var raf = new FileStream(path.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-            return new SimpleFSIndexInput("SimpleFSIndexInput(path=\"" + path.FullName + "\")", raf, context);
+            var task = Directory.CreateFileAsync(name).AsTask();
+            task.Wait();
+            var path = task.Result;
+            var taskirs = path.OpenAsync(FileAccessMode.ReadWrite).AsTask();
+            taskirs.Wait();
+            var raf = taskirs.Result.AsStream();
+            return new SimpleFSIndexInput("SimpleFSIndexInput(path=\"" + path.Path + "\")", raf, context);
         }
 
         public override IndexInputSlicer CreateSlicer(string name, IOContext context)
         {
             EnsureOpen();
-            var file = new FileInfo(Path.Combine(Directory.FullName, name));
-            var descriptor = new FileStream(file.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            var task = Directory.CreateFileAsync(name).AsTask();
+            task.Wait();
+            var file = task.Result;
+            var taskirs = file.OpenAsync(FileAccessMode.ReadWrite).AsTask();
+            taskirs.Wait();
+            var descriptor = taskirs.Result.AsStream();
             return new IndexInputSlicerAnonymousInnerClassHelper(this, context, file, descriptor);
         }
 
         private class IndexInputSlicerAnonymousInnerClassHelper : IndexInputSlicer
         {
             private readonly IOContext Context;
-            private readonly FileInfo File;
-            private readonly FileStream Descriptor;
+            private readonly StorageFile File;
+            private readonly Stream Descriptor;
 
-            public IndexInputSlicerAnonymousInnerClassHelper(SimpleFSDirectory outerInstance, IOContext context, FileInfo file, FileStream descriptor)
+            public IndexInputSlicerAnonymousInnerClassHelper(SimpleFSDirectory outerInstance, IOContext context, StorageFile file, Stream descriptor)
                 : base(outerInstance)
             {
                 this.Context = context;
@@ -90,13 +98,13 @@ namespace Lucene.Net.Store
             {
                 if (disposing)
                 {
-                    Descriptor.Close();
+                    Descriptor.Dispose();
                 }
             }
 
             public override IndexInput OpenSlice(string sliceDescription, long offset, long length)
             {
-                return new SimpleFSIndexInput("SimpleFSIndexInput(" + sliceDescription + " in path=\"" + File.FullName + "\" slice=" + offset + ":" + (offset + length) + ")", Descriptor, offset, length, BufferedIndexInput.BufferSize(Context));
+                return new SimpleFSIndexInput("SimpleFSIndexInput(" + sliceDescription + " in path=\"" + File.Path + "\" slice=" + offset + ":" + (offset + length) + ")", Descriptor, offset, length, BufferedIndexInput.BufferSize(Context));
             }
 
             [Obsolete]
@@ -127,7 +135,7 @@ namespace Lucene.Net.Store
 
             /// <summary>
             /// the file channel we will read from </summary>
-            protected internal readonly FileStream File;
+            protected internal readonly Stream File;
 
             /// <summary>
             /// is this instance a clone and hence does not own the file to close it </summary>
@@ -141,7 +149,7 @@ namespace Lucene.Net.Store
             /// end offset (start+length) </summary>
             protected internal readonly long End;
 
-            public SimpleFSIndexInput(string resourceDesc, FileStream file, IOContext context)
+            public SimpleFSIndexInput(string resourceDesc, Stream file, IOContext context)
                 : base(resourceDesc, context)
             {
                 this.File = file;
@@ -149,7 +157,7 @@ namespace Lucene.Net.Store
                 this.End = file.Length;
             }
 
-            public SimpleFSIndexInput(string resourceDesc, FileStream file, long off, long length, int bufferSize)
+            public SimpleFSIndexInput(string resourceDesc, Stream file, long off, long length, int bufferSize)
                 : base(resourceDesc, bufferSize)
             {
                 this.File = file;
@@ -162,7 +170,7 @@ namespace Lucene.Net.Store
             {
                 if (!IsClone)
                 {
-                    File.Close();
+                    File.Dispose();
                 }
             }
 

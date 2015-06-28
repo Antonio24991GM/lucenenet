@@ -199,7 +199,9 @@ namespace Lucene.Net.Store
         public override IndexInput OpenInput(string name, IOContext context)
         {
             EnsureOpen();
-            var file = new FileInfo(Path.Combine(Directory.FullName, name));
+            var tf = Directory.GetFileAsync(name).AsTask();
+            tf.Wait();
+            var file = tf.Result;
 
             var c = new FileStream(file.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
 
