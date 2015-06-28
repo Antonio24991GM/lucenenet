@@ -20,124 +20,61 @@
 */
 
 using System;
+using System.Reflection;
 using System.Linq;
+using Lucene.Net._81.Interfaces;
 
 namespace Lucene.Net.Support
 {
-    public class Deflater
+    public class Deflater : IDeflater
     {
-        //private Action<int> SetLevelDelegateA(int level);
-
-        private delegate void SetLevelDelegate(int level);
-
-        private delegate void SetInputDelegate(byte[] input, int offset, int count);
-
-        private delegate void FinishDelegate();
-
-        private delegate bool GetIsFinishedDelegate();
-
-        private delegate int DeflateDelegate(byte[] output);
-
-        private delegate void ResetDelegate();
-
-        private delegate bool GetIsNeedingInputDelegate();
-
-        private delegate int DeflateDelegate3(byte[] output, int offset, int length);
-
-        private SetLevelDelegate setLevelMethod;
-        private SetInputDelegate setInputMethod;
-        private FinishDelegate finishMethod;
-        private GetIsFinishedDelegate getIsFinishedMethod;
-        private DeflateDelegate deflateMethod;
-        private ResetDelegate resetMethod;
-        private GetIsNeedingInputDelegate getIsNeedingInputMethod;
-        private DeflateDelegate3 deflate3Method;
+        private IDeflater _deflater;
 
         public const int BEST_COMPRESSION = 9;
 
-        internal Deflater(object deflaterInstance)
+        internal Deflater(IDeflater deflaterInstance)
         {
-            Type type = deflaterInstance.GetType();
-
-            setLevelMethod = (SetLevelDelegate)Delegate.CreateDelegate(
-                typeof(SetLevelDelegate),
-                deflaterInstance,
-                type.GetMethod("SetLevel", new Type[] { typeof(int) }));
-            
-            setInputMethod = (SetInputDelegate)Delegate. CreateDelegate(
-                typeof(SetInputDelegate),
-                deflaterInstance,
-                type.GetMethod("SetInput", new Type[] { typeof(byte[]), typeof(int), typeof(int) }));
-
-            finishMethod = (FinishDelegate)Delegate.CreateDelegate(
-                typeof(FinishDelegate),
-                deflaterInstance,
-                type.GetMethod("Finish", Type.EmptyTypes));
-
-            getIsFinishedMethod = (GetIsFinishedDelegate)Delegate.CreateDelegate(
-                typeof(GetIsFinishedDelegate),
-                deflaterInstance,
-                type.GetMethod("get_IsFinished", Type.EmptyTypes));
-
-            deflateMethod = (DeflateDelegate)Delegate.CreateDelegate(
-                typeof(DeflateDelegate),
-                deflaterInstance,
-                type.GetMethod("Deflate", new Type[] { typeof(byte[]) }));
-
-            resetMethod = (ResetDelegate)Delegate.CreateDelegate(
-                typeof(ResetDelegate),
-                deflaterInstance,
-                type.GetMethod("Reset", Type.EmptyTypes));
-
-            getIsNeedingInputMethod = (GetIsNeedingInputDelegate)Delegate.CreateDelegate(
-                typeof(GetIsNeedingInputDelegate),
-                deflaterInstance,
-                type.GetMethod("get_IsNeedingInput", Type.EmptyTypes));
-
-            deflate3Method = (DeflateDelegate3)Delegate.CreateDelegate(
-                typeof(DeflateDelegate3),
-                deflaterInstance,
-                type.GetMethod("Deflate", new Type[] { typeof(byte[]), typeof(int), typeof(int) }));
+            _deflater = deflaterInstance;
         }
 
         public void SetLevel(int level)
         {
-            setLevelMethod(level);
+            _deflater.SetLevel(level);
         }
 
         public void SetInput(byte[] input, int offset, int count)
         {
-            setInputMethod(input, offset, count);
+            _deflater.SetInput(input, offset, count);
         }
 
         public void Finish()
         {
-            finishMethod();
+            _deflater.Finish();
         }
 
         public bool IsFinished
         {
-            get { return getIsFinishedMethod(); }
+            get { return _deflater.IsFinished; }
         }
 
         public int Deflate(byte[] output)
         {
-            return deflateMethod(output);
+            return _deflater.Deflate(output);
         }
 
         public int Deflate(byte[] output, int offset, int length)
         {
-            return deflate3Method(output, offset, length);
+            return _deflater.Deflate(output, offset, length);
         }
 
         public void Reset()
         {
-            resetMethod();
+            _deflater.Reset();
         }
 
         public bool NeedsInput
         {
-            get { return getIsNeedingInputMethod(); }
+            get { return _deflater.NeedsInput; }
         }
     }
 }

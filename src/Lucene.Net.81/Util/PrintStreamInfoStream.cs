@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Lucene.Net.Util
 {
@@ -49,7 +50,7 @@ namespace Lucene.Net.Util
 
         public override void Message(string component, string message)
         {
-            Stream.Write(component + " " + MessageID + " [" + DateTime.Now + "; " + Thread.CurrentThread.Name + "]: " + message);
+            Stream.Write(component + " " + MessageID + " [" + DateTime.Now + "; " + Task.CurrentId + "]: " + message);
         }
 
         public override bool IsEnabled(string component)
@@ -59,18 +60,6 @@ namespace Lucene.Net.Util
 
         public override void Dispose()
         {
-            if (!SystemStream)
-            {
-                Stream.Dispose();
-            }
-        }
-
-        public virtual bool SystemStream
-        {
-            get
-            {
-                return Stream == System.Diagnostics.Debug.Out || Stream == System.Diagnostics.Debug.Error;
-            }
         }
     }
 }
