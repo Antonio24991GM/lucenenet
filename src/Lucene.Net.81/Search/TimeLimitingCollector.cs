@@ -4,6 +4,7 @@ using System.Threading;
 namespace Lucene.Net.Search
 {
     using Lucene.Net.Support;
+    using System.Threading.Tasks;
 
     /*
          * Licensed to the Apache Software Foundation (ASF) under one or more
@@ -297,7 +298,6 @@ namespace Lucene.Net.Search
             {
                 this.resolution = resolution;
                 this.Counter = counter;
-                this.SetDaemon(true);
             }
 
             public TimerThread(Counter counter)
@@ -313,11 +313,11 @@ namespace Lucene.Net.Search
                     Counter.AddAndGet(resolution);
                     try
                     {
-                        Thread.Sleep(TimeSpan.FromMilliseconds(Interlocked.Read(ref resolution)));
+                        Task.Delay(TimeSpan.FromMilliseconds(Interlocked.Read(ref resolution)));
                     }
-                    catch (ThreadInterruptedException ie)
+                    catch (Exception ie)
                     {
-                        throw new ThreadInterruptedException("Thread Interrupted Exception", ie);
+                        throw new Exception("Thread Interrupted Exception", ie);
                     }
                 }
             }

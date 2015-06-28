@@ -155,7 +155,7 @@ namespace Lucene.Net.Index
     ///  <p><b>NOTE</b>: If you call
     ///  <code>Thread.interrupt()</code> on a thread that's within
     ///  IndexWriter, IndexWriter will try to catch this (eg, if
-    ///  it's in a wait() or Thread.sleep()), and will then throw
+    ///  it's in a wait() or Task.Delay()), and will then throw
     ///  the unchecked exception <seealso cref="ThreadInterruptedException"/>
     ///  and <b>clear</b> the interrupt status on the thread.</p>
     /// </summary>

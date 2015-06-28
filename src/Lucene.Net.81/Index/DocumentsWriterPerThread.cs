@@ -8,6 +8,7 @@ namespace Lucene.Net.Index
     using Lucene.Net.Support;
     using Lucene.Net.Util;
     using System.Globalization;
+    using System.Threading.Tasks;
     using Allocator = Lucene.Net.Util.ByteBlockPool.Allocator;
 
     /*
@@ -240,7 +241,7 @@ namespace Lucene.Net.Index
             Debug.Assert(numDocsInRAM == 0);
             if (INFO_VERBOSE && infoStream.IsEnabled("DWPT"))
             {
-                infoStream.Message("DWPT", Thread.CurrentThread.Name + " init seg=" + segmentName + " delQueue=" + deleteQueue);
+                infoStream.Message("DWPT", Task.CurrentId + " init seg=" + segmentName + " delQueue=" + deleteQueue);
             }
             // this should be the last call in the ctor
             // it really sucks that we need to pull this within the ctor and pass this ref to the chain!
@@ -277,7 +278,7 @@ namespace Lucene.Net.Index
             docState.DocID = numDocsInRAM;
             if (INFO_VERBOSE && InfoStream.IsEnabled("DWPT"))
             {
-                InfoStream.Message("DWPT", Thread.CurrentThread.Name + " update delTerm=" + delTerm + " docID=" + docState.DocID + " seg=" + SegmentInfo_Renamed.Name);
+                InfoStream.Message("DWPT", Task.CurrentId + " update delTerm=" + delTerm + " docID=" + docState.DocID + " seg=" + SegmentInfo_Renamed.Name);
             }
             bool success = false;
             try
@@ -331,7 +332,7 @@ namespace Lucene.Net.Index
             docState.Analyzer = analyzer;
             if (INFO_VERBOSE && InfoStream.IsEnabled("DWPT"))
             {
-                InfoStream.Message("DWPT", Thread.CurrentThread.Name + " update delTerm=" + delTerm + " docID=" + docState.DocID + " seg=" + SegmentInfo_Renamed.Name);
+                InfoStream.Message("DWPT", Task.CurrentId + " update delTerm=" + delTerm + " docID=" + docState.DocID + " seg=" + SegmentInfo_Renamed.Name);
             }
             int docCount = 0;
             bool allDocsIndexed = false;

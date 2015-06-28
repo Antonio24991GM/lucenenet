@@ -5,7 +5,9 @@ using System.Threading;
 
 namespace Lucene.Net.Index
 {
+    using Lucene.Net._81.Threads;
     using Lucene.Net.Support;
+    using System.Threading.Tasks;
     using CollectionUtil = Lucene.Net.Util.CollectionUtil;
 
     /*
@@ -255,11 +257,11 @@ namespace Lucene.Net.Index
                         {
                             if (doPause)
                             {
-                                Message("pause thread " + mergeThread.Name);
+                                Message("pause thread " + mergeThread.Instance.Id);
                             }
                             else
                             {
-                                Message("unpause thread " + mergeThread.Name);
+                                Message("unpause thread " + mergeThread.Instance.Id);
                             }
                         }
                     }
@@ -272,9 +274,8 @@ namespace Lucene.Net.Index
                     {
                         if (Verbose())
                         {
-                            Message("set priority of merge thread " + mergeThread.Name + " to " + pri);
+                            Message("set priority of merge thread " + mergeThread.Instance.Id + " to " + pri);
                         }
-                        mergeThread.ThreadPriority = pri;
                         pri = Math.Min((int)ThreadPriority.Highest, 1 + pri);
                     }
                 }
@@ -307,19 +308,6 @@ namespace Lucene.Net.Index
 
         private void InitMergeThreadPriority()
         {
-            lock (this)
-            {
-                if (MergeThreadPriority_Renamed == -1)
-                {
-                    // Default to slightly higher priority than our
-                    // calling thread
-                    MergeThreadPriority_Renamed = 1 + (int)ThreadClass.Current().Priority;
-                    if (MergeThreadPriority_Renamed > (int)ThreadPriority.Highest)
-                    {
-                        MergeThreadPriority_Renamed = (int)ThreadPriority.Highest;
-                    }
-                }
-            }
         }
 
         public override void Dispose()
@@ -354,7 +342,7 @@ namespace Lucene.Net.Index
                         {
                             toSync.Join();
                         }
-                        catch (ThreadInterruptedException ie)
+                        catch (Exception ie)
                         {
                             // ignore this Exception, we will retry until all threads are dead
                             interrupted = true;
@@ -371,7 +359,6 @@ namespace Lucene.Net.Index
                 // finally, restore interrupt status:
                 if (interrupted)
                 {
-                    Thread.CurrentThread.Interrupt();
                 }
             }
         }
@@ -446,9 +433,9 @@ namespace Lucene.Net.Index
                         {
                             Monitor.Wait(this);
                         }
-                        catch (ThreadInterruptedException ie)
+                        catch (Exception ie)
                         {
-                            throw new ThreadInterruptedException("Thread Interrupted Exception", ie);
+                            throw new Exception("Thread Interrupted Exception", ie);
                         }
                     }
 
@@ -484,7 +471,7 @@ namespace Lucene.Net.Index
                         MergeThreads.Add(merger);
                         if (Verbose())
                         {
-                            Message("    launch new thread [" + merger.Name + "]");
+                            Message("    launch new thread [" + merger.Instance.Id + "]");
                         }
 
                         merger.Start();
@@ -521,9 +508,6 @@ namespace Lucene.Net.Index
             lock (this)
             {
                 MergeThread thread = new MergeThread(this, writer, merge);
-                thread.ThreadPriority = MergeThreadPriority_Renamed;
-                thread.IsBackground = true;
-                thread.Name = "Lucene Merge Thread #" + MergeThreadCount_Renamed++;
                 return thread;
             }
         }
@@ -592,29 +576,6 @@ namespace Lucene.Net.Index
                         {
                             return StartMerge;
                         }
-                    }
-                }
-            }
-
-            /// <summary>
-            /// Set the priority of this thread. </summary>
-            public virtual int ThreadPriority
-            {
-                set
-                {
-                    try
-                    {
-                        Priority = (ThreadPriority)value;
-                    }
-                    catch (System.NullReferenceException npe)
-                    {
-                        // Strangely, Sun's JDK 1.5 on Linux sometimes
-                        // throws NPE out of here...
-                    }
-                    catch (System.Security.SecurityException se)
-                    {
-                        // Ignore this because we will still run fine with
-                        // normal thread priority
                     }
                 }
             }
@@ -709,11 +670,11 @@ namespace Lucene.Net.Index
                 // transient then the exception will keep happening,
                 // so, we sleep here to avoid saturating CPU in such
                 // cases:
-                Thread.Sleep(250);
+                Task.Delay(250);
             }
-            catch (ThreadInterruptedException ie)
+            catch (Exception ie)
             {
-                throw new ThreadInterruptedException("Thread Interrupted Exception", ie);
+                throw new Exception("Thread Interrupted Exception", ie);
             }
             throw new MergePolicy.MergeException(exc, Dir);
         }

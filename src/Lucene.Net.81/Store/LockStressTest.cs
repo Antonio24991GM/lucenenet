@@ -133,7 +133,7 @@ namespace Lucene.Net.Store
 
             //            if (obtained)
             //            {
-            //                Thread.Sleep(sleepTimeMS);
+            //                Task.Delay(sleepTimeMS);
             //                l.Release();
             //            }
 
@@ -142,7 +142,7 @@ namespace Lucene.Net.Store
             //                System.Diagnostics.Debug.WriteLine((i * 100.0 / count) + "% done.");
             //            }
 
-            //            Thread.Sleep(sleepTimeMS);
+            //            Task.Delay(sleepTimeMS);
             //        }
             //    }
             //}

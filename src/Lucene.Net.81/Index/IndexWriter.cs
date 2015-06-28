@@ -11,6 +11,7 @@ namespace Lucene.Net.Index
     using System.Collections.Concurrent;
     using System.Globalization;
     using System.IO;
+    using System.Threading.Tasks;
     using AlreadyClosedException = Lucene.Net.Store.AlreadyClosedException;
 
     /*
@@ -155,7 +156,7 @@ namespace Lucene.Net.Index
     ///  <p><b>NOTE</b>: If you call
     ///  <code>Thread.interrupt()</code> on a thread that's within
     ///  IndexWriter, IndexWriter will try to catch this (eg, if
-    ///  it's in a wait() or Thread.sleep()), and will then throw
+    ///  it's in a wait() or Task.Delay()), and will then throw
     ///  the unchecked exception <seealso cref="ThreadInterruptedException"/>
     ///  and <b>clear</b> the interrupt status on the thread.</p>
     /// </summary>
@@ -1198,7 +1199,7 @@ namespace Lucene.Net.Index
                                 // any pending merges are waiting:
                                 mergeScheduler.Merge(this, MergeTrigger.CLOSING, false);
                             }
-                            catch (ThreadInterruptedException)
+                            catch (Exception)
                             {
                                 // ignore any interruption, does not matter
                                 interrupted = true;
@@ -1218,7 +1219,7 @@ namespace Lucene.Net.Index
                                     FinishMerges(waitForMerges && !interrupted);
                                     break;
                                 }
-                                catch (ThreadInterruptedException)
+                                catch (Exception)
                                 {
                                     // by setting the interrupted status, the
                                     // next call to finishMerges will pass false,
@@ -1297,7 +1298,6 @@ namespace Lucene.Net.Index
                 // finally, restore interrupt status:
                 if (interrupted)
                 {
-                    Thread.CurrentThread.Interrupt();
                 }
             }
         }
@@ -5367,9 +5367,9 @@ namespace Lucene.Net.Index
                 {
                     Monitor.Wait(this, TimeSpan.FromMilliseconds(1000));
                 }
-                catch (ThreadInterruptedException ie)
+                catch (Exception ie)
                 {
-                    throw new ThreadInterruptedException("Thread Interrupted Exception", ie);
+                    throw new Exception("Thread Interrupted Exception", ie);
                 }
             }
         }

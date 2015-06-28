@@ -7,6 +7,7 @@ namespace Lucene.Net.Index
 {
     using Lucene.Net.Support;
     using System.Collections.Concurrent;
+    using System.Threading.Tasks;
     using AlreadyClosedException = Lucene.Net.Store.AlreadyClosedException;
 
     /*
@@ -774,7 +775,7 @@ namespace Lucene.Net.Index
                 {
                     if (InfoStream.IsEnabled("DW"))
                     {
-                        InfoStream.Message("DW", Thread.CurrentThread.Name + ": flush naked frozen global deletes");
+                        InfoStream.Message("DW", Task.CurrentId + ": flush naked frozen global deletes");
                     }
                     TicketQueue.AddDeletes(flushingDeleteQueue);
                 }
@@ -794,7 +795,7 @@ namespace Lucene.Net.Index
             {
                 if (InfoStream.IsEnabled("DW"))
                 {
-                    InfoStream.Message("DW", Thread.CurrentThread.Name + " finishFullFlush success=" + success);
+                    InfoStream.Message("DW", Task.CurrentId + " finishFullFlush success=" + success);
                 }
                 Debug.Assert(SetFlushingDeleteQueue(null));
                 if (success)

@@ -2,6 +2,7 @@ using Lucene.Net.Support;
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Lucene.Net.Util
 {
@@ -58,7 +59,7 @@ namespace Lucene.Net.Util
 
         // Use a WeakHashMap so that if a Thread exits and is
         // GC'able, its entry may be removed:
-        private IDictionary<Thread, T> HardRefs = new HashMap<Thread, T>();
+        private IDictionary<int, T> HardRefs = new HashMap<int, T>();
 
         // Increase this to decrease frequency of purging in get:
         private static int PURGE_MULTIPLIER = 20;
@@ -104,7 +105,7 @@ namespace Lucene.Net.Util
 
             lock (HardRefs)
             {
-                HardRefs[Thread.CurrentThread] = @object;
+                HardRefs[Task.CurrentId.Value] = @object;
                 MaybePurge();
             }
         }
@@ -120,43 +121,6 @@ namespace Lucene.Net.Util
         // Purge dead threads
         private void Purge()
         {
-            lock (HardRefs)
-            {
-                int stillAliveCount = 0;
-                //Placing in try-finally to ensure HardRef threads are removed in the case of an exception
-                List<Thread> Removed = new List<Thread>();
-                try
-                {
-                    for (IEnumerator<Thread> it = HardRefs.Keys.GetEnumerator(); it.MoveNext(); )
-                    {
-                        Thread t = it.Current;
-                        if (!t.IsAlive)
-                        {
-                            Removed.Add(t);
-                        }
-                        else
-                        {
-                            stillAliveCount++;
-                        }
-                    }
-                }
-                finally
-                {
-                    foreach (Thread thd in Removed)
-                    {
-                        HardRefs.Remove(thd);
-                    }
-                }
-
-                int nextCount = (1 + stillAliveCount) * PURGE_MULTIPLIER;
-                if (nextCount <= 0)
-                {
-                    // defensive: int overflow!
-                    nextCount = 1000000;
-                }
-
-                Interlocked.Exchange(ref CountUntilPurge, nextCount);
-            }
         }
 
         public void Dispose()

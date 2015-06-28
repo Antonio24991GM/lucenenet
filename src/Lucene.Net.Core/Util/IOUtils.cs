@@ -7,6 +7,7 @@ namespace Lucene.Net.Util
     using System.Diagnostics;
     using System.IO;
     using System.Text;
+    using System.Threading.Tasks;
 
     /*
                      * Licensed to the Apache Software Foundation (ASF) under one or more
@@ -475,7 +476,7 @@ namespace Lucene.Net.Util
                     }
 
                     // Pause 5 msec
-                    Thread.Sleep(5);
+                    Task.Delay(5);
                 }
                 finally
                 {

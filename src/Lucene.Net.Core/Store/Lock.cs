@@ -1,5 +1,6 @@
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Lucene.Net.Store
 {
@@ -100,7 +101,7 @@ namespace Lucene.Net.Store
                 }
                 try
                 {
-                    Thread.Sleep(TimeSpan.FromMilliseconds(LOCK_POLL_INTERVAL));
+                    Task.Delay(TimeSpan.FromMilliseconds(LOCK_POLL_INTERVAL));
                 }
                 catch (ThreadInterruptedException ie)
                 {

@@ -3,6 +3,8 @@ using System.Threading;
 namespace Lucene.Net.Store
 {
     using System;
+    using System.Threading.Tasks;
+
 
     /*
          * Licensed to the Apache Software Foundation (ASF) under one or more
@@ -111,7 +113,7 @@ namespace Lucene.Net.Store
                     LastNS = curNS;
                 }
 
-                // While loop because Thread.sleep doesn't always sleep
+                // While loop because Task.Delay doesn't always sleep
                 // enough:
                 while (true)
                 {
@@ -120,11 +122,11 @@ namespace Lucene.Net.Store
                     {
                         try
                         {
-                            Thread.Sleep((int)(pauseNS / 1000000));
+                            Task.Delay((int)(pauseNS / 1000000));
                         }
-                        catch (ThreadInterruptedException ie)
+                        catch (Exception ie)
                         {
-                            throw new ThreadInterruptedException("Thread Interrupted Exception", ie);
+                            throw new Exception("Thread Interrupted Exception", ie);
                         }
                         curNS = DateTime.UtcNow.Ticks * 100;
                         continue;

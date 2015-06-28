@@ -1,6 +1,7 @@
 using Lucene.Net.Support;
 using System.Globalization;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Lucene.Net.Util
 {
@@ -53,13 +54,10 @@ namespace Lucene.Net.Util
         /// Creates a new <seealso cref="Thread"/>
         /// </summary>
         /// <seealso cref= java.util.concurrent.ThreadFactory#newThread(java.lang.Runnable) </seealso>
-        public override Thread NewThread(IThreadRunnable r)
+        public override Task NewThread(IThreadRunnable r)
         {
-            Thread t = new Thread(r.Run)
+            var t = new Task(r.Run)
             {
-                Name = string.Format(CultureInfo.InvariantCulture, "{0}-{1}", this.ThreadNamePrefix, Interlocked.Increment(ref ThreadNumber)),
-                IsBackground = false,
-                Priority = ThreadPriority.Normal
             };
 
             return t;

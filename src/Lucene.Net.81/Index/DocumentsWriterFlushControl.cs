@@ -6,6 +6,7 @@ using System.Threading;
 namespace Lucene.Net.Index
 {
     using Lucene.Net.Support;
+    using System.Threading.Tasks;
     using InfoStream = Lucene.Net.Util.InfoStream;
 
     /*
@@ -300,9 +301,9 @@ namespace Lucene.Net.Index
                     {
                         Monitor.Wait(this);
                     }
-                    catch (ThreadInterruptedException e)
+                    catch (TaskCanceledException e)
                     {
-                        throw new ThreadInterruptedException("Thread Interrupted Exception", e);
+                        throw new TaskCanceledException("Thread Interrupted Exception", e);
                     }
                 }
             }
@@ -585,32 +586,6 @@ namespace Lucene.Net.Index
         internal int NumActiveDWPT()
         {
             return this.PerThreadPool.ActiveThreadState;
-        }
-
-        internal ThreadState ObtainAndLock()
-        {
-            ThreadState perThread = PerThreadPool.GetAndLock(Thread.CurrentThread, DocumentsWriter);
-            bool success = false;
-            try
-            {
-                if (perThread.Initialized && perThread.Dwpt.DeleteQueue != DocumentsWriter.DeleteQueue)
-                {
-                    // There is a flush-all in process and this DWPT is
-                    // now stale -- enroll it for flush and try for
-                    // another DWPT:
-                    AddFlushableState(perThread);
-                }
-                success = true;
-                // simply return the ThreadState even in a flush all case sine we already hold the lock
-                return perThread;
-            }
-            finally
-            {
-                if (!success) // make sure we unlock if this fails
-                {
-                    perThread.Unlock();
-                }
-            }
         }
 
         internal void MarkForFullFlush()

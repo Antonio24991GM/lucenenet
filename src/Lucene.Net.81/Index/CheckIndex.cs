@@ -2442,7 +2442,7 @@ namespace Lucene.Net.Index
               System.Diagnostics.Debug.WriteLine("NOTE: will write new segments file in 5 seconds; this will remove " + result.TotLoseDocCount + " docs from the index. this IS YOUR LAST CHANCE TO CTRL+C!");
               for (int s = 0;s < 5;s++)
               {
-                Thread.Sleep(1000);
+                Task.Delay(1000);
                 System.Diagnostics.Debug.WriteLine("  " + (5 - s) + "...");
               }
               System.Diagnostics.Debug.WriteLine("Writing...");

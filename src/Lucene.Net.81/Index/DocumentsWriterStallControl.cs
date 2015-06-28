@@ -5,6 +5,8 @@ using System.Threading;
 namespace Lucene.Net.Index
 {
     using Lucene.Net.Support;
+    using System.Threading.Tasks;
+
 
     /*
          * Licensed to the Apache Software Foundation (ASF) under one or more
@@ -89,9 +91,9 @@ namespace Lucene.Net.Index
                             result = DecrWaiters();
                             Debug.Assert(result);
                         }
-                        catch (ThreadInterruptedException e)
+                        catch (TaskCanceledException e)
                         {
-                            throw new ThreadInterruptedException("Thread Interrupted Exception", e);
+                            throw new TaskCanceledException("Thread Interrupted Exception", e);
                         }
                     }
                 }

@@ -19,8 +19,10 @@
  *
 */
 
+using Lucene.Net._81.Threads;
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Lucene.Net.Support
 {
@@ -32,44 +34,26 @@ namespace Lucene.Net.Support
         /// <summary>
         /// The instance of System.Threading.Thread
         /// </summary>
-        private Thread _threadField;
+        private Task _threadField;
+        private CancellationToken _cancellationToken;
+        private CancellationTokenSource _cancellationSource;
 
         /// <summary>
         /// Initializes a new instance of the ThreadClass class
         /// </summary>
         public ThreadClass()
         {
-            _threadField = new Thread(Run);
+            _cancellationSource = new CancellationTokenSource();
+            _cancellationToken = _cancellationSource.Token;
+            _threadField = new Task(Run, _cancellationToken);
         }
 
         /// <summary>
         /// Initializes a new instance of the Thread class.
         /// </summary>
         /// <param name="name">The name of the thread</param>
-        public ThreadClass(System.String name)
+        public ThreadClass(System.String name) : this()
         {
-            _threadField = new Thread(Run);
-            this.Name = name;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the Thread class.
-        /// </summary>
-        /// <param name="start">A ThreadStart delegate that references the methods to be invoked when this thread begins executing</param>
-        public ThreadClass(ThreadStart start)
-        {
-            _threadField = new Thread(start);
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the Thread class.
-        /// </summary>
-        /// <param name="start">A ThreadStart delegate that references the methods to be invoked when this thread begins executing</param>
-        /// <param name="Name">The name of the thread</param>
-        public ThreadClass(ThreadStart start, String Name)
-        {
-            _threadField = new Thread(start);
-            this.Name = Name;
         }
 
         /// <summary>
@@ -92,13 +76,13 @@ namespace Lucene.Net.Support
         /// </summary>
         public virtual void Interrupt()
         {
-            _threadField.Interrupt();
+            _cancellationSource.Cancel();
         }
 
         /// <summary>
         /// Gets the current thread instance
         /// </summary>
-        public System.Threading.Thread Instance
+        public Task Instance
         {
             get
             {
@@ -111,75 +95,13 @@ namespace Lucene.Net.Support
         }
 
         /// <summary>
-        /// Gets or sets the name of the thread
-        /// </summary>
-        public String Name
-        {
-            get
-            {
-                return _threadField.Name;
-            }
-            set
-            {
-                if (_threadField.Name == null)
-                    _threadField.Name = value;
-            }
-        }
-
-        public void SetDaemon(bool isDaemon)
-        {
-            _threadField.IsBackground = isDaemon;
-        }
-
-        /// <summary>
-        /// Gets or sets a value indicating the scheduling priority of a thread
-        /// </summary>
-        public ThreadPriority Priority
-        {
-            get
-            {
-                try
-                {
-                    return _threadField.Priority;
-                }
-                catch
-                {
-                    return ThreadPriority.Normal;
-                }
-            }
-            set
-            {
-                try
-                {
-                    _threadField.Priority = value;
-                }
-                catch { }
-            }
-        }
-
-        /// <summary>
         /// Gets a value indicating the execution status of the current thread
         /// </summary>
         public bool IsAlive
         {
             get
             {
-                return _threadField.IsAlive;
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether or not a thread is a background thread.
-        /// </summary>
-        public bool IsBackground
-        {
-            get
-            {
-                return _threadField.IsBackground;
-            }
-            set
-            {
-                _threadField.IsBackground = value;
+                return _threadField.IsCanceled;
             }
         }
 
@@ -188,7 +110,7 @@ namespace Lucene.Net.Support
         /// </summary>
         public void Join()
         {
-            _threadField.Join();
+            _threadField.Wait();
         }
 
         /// <summary>
@@ -197,7 +119,7 @@ namespace Lucene.Net.Support
         /// <param name="MiliSeconds">Time of wait in milliseconds</param>
         public void Join(long MiliSeconds)
         {
-            _threadField.Join(new System.TimeSpan(MiliSeconds * 10000));
+            _threadField.Wait(new System.TimeSpan(MiliSeconds * 10000));
         }
 
         /// <summary>
@@ -207,7 +129,7 @@ namespace Lucene.Net.Support
         /// <param name="NanoSeconds">Time of wait in nanoseconds</param>
         public void Join(long MiliSeconds, int NanoSeconds)
         {
-            _threadField.Join(new System.TimeSpan(MiliSeconds * 10000 + NanoSeconds * 100));
+            _threadField.Wait(new System.TimeSpan(MiliSeconds * 10000 + NanoSeconds * 100));
         }
 
         /// <summary>
@@ -225,7 +147,7 @@ namespace Lucene.Net.Support
         /// </summary>
         public void Abort()
         {
-            _threadField.Abort();
+            _cancellationSource.Cancel();
         }
 
         /// <summary>
@@ -237,7 +159,7 @@ namespace Lucene.Net.Support
         /// <param name="stateInfo">An object that contains application-specific information, such as state, which can be used by the thread being aborted</param>
         public void Abort(object stateInfo)
         {
-            _threadField.Abort(stateInfo);
+            _cancellationSource.Cancel();
         }
 
         /// <summary>
@@ -254,7 +176,7 @@ namespace Lucene.Net.Support
         /// <returns>A String that represents the current object</returns>
         public override System.String ToString()
         {
-            return "Thread[" + Name + "," + Priority.ToString() + "]";
+            return "Thread[" + _threadField.Id + "]";
         }
 
         [ThreadStatic]
@@ -270,7 +192,7 @@ namespace Lucene.Net.Support
         {
             // casting long ms to int ms could lose resolution, however unlikely
             // that someone would want to sleep for that long...
-            Thread.Sleep((int)ms);
+            Task.Delay((int)ms);
         }
 
         /// <summary>
@@ -282,7 +204,6 @@ namespace Lucene.Net.Support
             if (This == null)
             {
                 This = new ThreadClass();
-                This.Instance = Thread.CurrentThread;
             }
             return This;
         }
@@ -308,11 +229,6 @@ namespace Lucene.Net.Support
         public override int GetHashCode()
         {
             return this._threadField.GetHashCode();
-        }
-
-        public ThreadState State
-        {
-            get { return _threadField.ThreadState; }
         }
     }
 }

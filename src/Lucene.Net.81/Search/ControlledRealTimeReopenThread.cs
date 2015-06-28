@@ -147,9 +147,9 @@ namespace Lucene.Net.Search
                 {
                     Join();
                 }
-                catch (ThreadInterruptedException ie)
+                catch (Exception ie)
                 {
-                    throw new ThreadInterruptedException("Thread Interrupted Exception", ie);
+                    throw new Exception("Thread Interrupted Exception", ie);
                 }
 
                 // Max it out so any waiting search threads will return:
@@ -281,9 +281,8 @@ namespace Lucene.Net.Search
                             break;
                         }
                     }
-                    catch (ThreadInterruptedException ie)
+                    catch (Exception ie)
                     {
-                        Thread.CurrentThread.Interrupt();
                         return;
                     }
                     finally

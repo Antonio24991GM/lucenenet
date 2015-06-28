@@ -7,6 +7,7 @@ using System.Threading;
 namespace Lucene.Net.Index
 {
     using Lucene.Net.Util;
+    using System.Threading.Tasks;
 
     /*
          * Licensed to the Apache Software Foundation (ASF) under one or more
@@ -296,7 +297,7 @@ namespace Lucene.Net.Index
                             // do 1000 msec, defensively
                             Monitor.Wait(this, TimeSpan.FromMilliseconds(1000));
                         }
-                        catch (ThreadInterruptedException ie)
+                        catch (TaskCanceledException ie)
                         {
                             throw new Exception(ie.Message, ie);
                         }

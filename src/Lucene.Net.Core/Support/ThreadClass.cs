@@ -21,6 +21,7 @@
 
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Lucene.Net.Support
 {
@@ -270,7 +271,7 @@ namespace Lucene.Net.Support
         {
             // casting long ms to int ms could lose resolution, however unlikely
             // that someone would want to sleep for that long...
-            Thread.Sleep((int)ms);
+            Task.Delay((int)ms);
         }
 
         /// <summary>

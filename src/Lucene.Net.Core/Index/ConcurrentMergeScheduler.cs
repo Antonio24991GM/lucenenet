@@ -6,6 +6,7 @@ using System.Threading;
 namespace Lucene.Net.Index
 {
     using Lucene.Net.Support;
+    using System.Threading.Tasks;
     using CollectionUtil = Lucene.Net.Util.CollectionUtil;
 
     /*
@@ -709,7 +710,7 @@ namespace Lucene.Net.Index
                 // transient then the exception will keep happening,
                 // so, we sleep here to avoid saturating CPU in such
                 // cases:
-                Thread.Sleep(250);
+                Task.Delay(250);
             }
             catch (ThreadInterruptedException ie)
             {

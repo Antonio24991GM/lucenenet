@@ -7,6 +7,7 @@ namespace Lucene.Net.Index
     using System;
     using System.IO;
     using System.Text.RegularExpressions;
+    using System.Threading.Tasks;
 
     /*
          * Licensed to the Apache Software Foundation (ASF) under one or more
@@ -736,14 +737,14 @@ namespace Lucene.Net.Index
                 }
                 else
                 {
-                    Debug.Assert(Count > 0, Thread.CurrentThread.Name + ": RefCount is 0 pre-increment for file \"" + FileName + "\"");
+                    Debug.Assert(Count > 0, Task.CurrentId + FileName + "\"");
                 }
                 return ++Count;
             }
 
             public int DecRef()
             {
-                Debug.Assert(Count > 0, Thread.CurrentThread.Name + ": RefCount is 0 pre-decrement for file \"" + FileName + "\"");
+                Debug.Assert(Count > 0, Task.CurrentId + ": RefCount is 0 pre-decrement for file \"" + FileName + "\"");
                 return --Count;
             }
         }

@@ -3,6 +3,7 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Lucene.Net.Store
 {
@@ -134,7 +135,7 @@ namespace Lucene.Net.Store
 
                         if (obtained)
                         {
-                            Thread.Sleep(sleepTimeMS);
+                            Task.Delay(sleepTimeMS);
                             l.Release();
                         }
 
@@ -143,7 +144,7 @@ namespace Lucene.Net.Store
                             Console.WriteLine((i * 100.0 / count) + "% done.");
                         }
 
-                        Thread.Sleep(sleepTimeMS);
+                        Task.Delay(sleepTimeMS);
                     }
                 }
             }

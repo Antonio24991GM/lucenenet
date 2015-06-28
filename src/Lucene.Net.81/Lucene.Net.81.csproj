@@ -720,6 +720,7 @@
     <Compile Include="Support\TimeHelper.cs" />
     <Compile Include="Support\UnmodifiableDictionary.cs" />
     <Compile Include="Support\WeakDictionary.cs" />
+    <Compile Include="Threads\ThreadPriority.cs" />
     <Compile Include="Util\Accountable.cs" />
     <Compile Include="Util\ArrayInPlaceMergeSorter.cs" />
     <Compile Include="Util\ArrayIntroSorter.cs" />
@@ -910,6 +911,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="IO\" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '12.0' ">
     <VisualStudioVersion>12.0</VisualStudioVersion>
