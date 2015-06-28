@@ -19,9 +19,7 @@
  *
 */
 
-using Windows.Security.Cryptography;
-using Windows.Security.Cryptography.Core;
-using Windows.Storage.Streams;
+using Lucene.Net._81.Cryptography;
 
 namespace Lucene.Net.Support
 {
@@ -29,21 +27,11 @@ namespace Lucene.Net.Support
     {
         public static bool FIPSCompliant = false;
 
-        public static HashAlgorithmProvider HashAlgorithm
+        public static HashAlgorithm HashAlgorithm
         {
             get
             {
-
-                if (FIPSCompliant)
-                {
-                    //LUCENENET-175
-                    //No Assumptions should be made on the HashAlgorithm. It may change in time.
-                    //SHA256 SHA384 SHA512 etc.
-                    return HashAlgorithmProvider.OpenAlgorithm("SHA1");
-                    //SHA1.Create();
-                }
-                return HashAlgorithmProvider.OpenAlgorithm("MD5");
-                //MD5.Create();
+                return true;
             }
         }
     }

@@ -902,7 +902,7 @@ namespace Lucene.Net.Util
             }
             catch (Exception e)
             {
-                throw new SystemException(e.Message, e);
+                throw new Exception(e.Message, e);
             }
         }
 

@@ -182,12 +182,7 @@ namespace Lucene.Net.Store
         /// </summary>
         public static FSDirectory Open(StorageFolder path, LockFactory lockFactory)
         {
-            if ((Constants.WINDOWS || Constants.SUN_OS || Constants.LINUX) && Constants.JRE_IS_64BIT &&
-                MMapDirectory.UNMAP_SUPPORTED)
-            {
-                return new MMapDirectory(path, lockFactory);
-            }
-            else if (Constants.WINDOWS)
+            if (Constants.WINDOWS)
             {
                 return new SimpleFSDirectory(path, lockFactory);
             }

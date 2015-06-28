@@ -23,7 +23,7 @@ namespace Lucene.Net
 
         public static IList<T> UnmodifiableList<T>(List<T> items)
         {
-            return items.AsReadOnly();
+            return items;
         }
 
         public static ISet<T> UnmodifiableSet<T>(IEnumerable<T> items)

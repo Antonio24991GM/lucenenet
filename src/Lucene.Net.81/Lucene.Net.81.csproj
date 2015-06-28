@@ -254,8 +254,11 @@
     <Compile Include="Collections\ArrayList.cs" />
     <Compile Include="Collections\Hashtable.cs" />
     <Compile Include="Collections\ICloneable.cs" />
+    <Compile Include="Collections\IHashCodeProvider.cs" />
     <Compile Include="Collections\IOrderedDictionary.cs" />
     <Compile Include="Collections\OrderedDictionary.cs" />
+    <Compile Include="Cryptography\HasAlgorithm.cs" />
+    <Compile Include="Cryptography\ICryptoTransform.cs" />
     <Compile Include="Document\BinaryDocValuesField.cs" />
     <Compile Include="Document\ByteDocValuesField.cs" />
     <Compile Include="Document\CompressionTools.cs" />
@@ -701,7 +704,6 @@
     <Compile Include="Support\IThreadRunnable.cs" />
     <Compile Include="Support\ListExtensions.cs" />
     <Compile Include="Support\MathExtension.cs" />
-    <Compile Include="Support\MemoryMappedFileByteBuffer.cs" />
     <Compile Include="Support\Number.cs" />
     <Compile Include="Support\OS.cs" />
     <Compile Include="Support\PriorityQueue.cs" />
@@ -910,13 +912,15 @@
       <HintPath>..\..\packages\SharpSerializer.2.20\lib\portable-net4+sl4+wp+windows8+xbox\Polenter.SharpSerializer.Portable.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.Collections.Immutable, Version=1.1.36.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Collections.Immutable.1.1.36\lib\portable-net45+win8+wp8+wpa81\System.Collections.Immutable.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="IO\" />
-  </ItemGroup>
+  <ItemGroup />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '12.0' ">
     <VisualStudioVersion>12.0</VisualStudioVersion>
   </PropertyGroup>

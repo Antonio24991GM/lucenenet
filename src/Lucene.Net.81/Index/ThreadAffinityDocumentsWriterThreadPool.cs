@@ -48,45 +48,6 @@ namespace Lucene.Net.Index
             Debug.Assert(MaxThreadStates >= 1);
         }
 
-        public override ThreadState GetAndLock(Task requestingThread, DocumentsWriter documentsWriter)
-        {
-            ThreadState threadState;
-            ThreadBindings.TryGetValue(requestingThread, out threadState);
-            if (threadState != null && threadState.TryLock())
-            {
-                return threadState;
-            }
-            ThreadState minThreadState = null;
-
-            /* TODO -- another thread could lock the minThreadState we just got while
-             we should somehow prevent this. */
-            // Find the state that has minimum number of threads waiting
-            minThreadState = MinContendedThreadState();
-            if (minThreadState == null || minThreadState.HasQueuedThreads)
-            {
-                ThreadState newState = NewThreadState(); // state is already locked if non-null
-                if (newState != null)
-                {
-                    //Debug.Assert(newState.HeldByCurrentThread);
-                    ThreadBindings[requestingThread] = newState;
-                    return newState;
-                }
-                else if (minThreadState == null)
-                {
-                    /*
-                     * no new threadState available we just take the minContented one
-                     * this must return a valid thread state since we accessed the
-                     * synced context in newThreadState() above.
-                     */
-                    minThreadState = MinContendedThreadState();
-                }
-            }
-            Debug.Assert(minThreadState != null, "ThreadState is null");
-
-            minThreadState.@Lock();
-            return minThreadState;
-        }
-
         public override object Clone()
         {
             ThreadAffinityDocumentsWriterThreadPool clone = (ThreadAffinityDocumentsWriterThreadPool)base.Clone();
