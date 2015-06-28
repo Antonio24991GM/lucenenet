@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
+using System.Linq;
 
 namespace Lucene.Net.Util
 {
@@ -123,7 +124,8 @@ namespace Lucene.Net.Util
 		}
         //LUCENE-TODO unsure about GetType()
         Type interf = (Type)interfaces.First.Value.GetType();
-        FieldInfo[] fields = clazz.GetFields(BindingFlags.Instance | BindingFlags.Public);
+            FieldInfo[] fields = clazz.GetTypeInfo().DeclaredFields.Where(x => x.IsInitOnly || x.IsPublic).ToArray();
+            //( .GetFields(BindingFlags.Instance | BindingFlags.Public);
 		try
 		{
 		  for (int i = 0; i < fields.Length; i++)
