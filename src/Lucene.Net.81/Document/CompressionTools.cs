@@ -47,8 +47,8 @@ namespace Lucene.Net.Documents
              * there is no guarantee that the compressed data will be smaller than
              * the uncompressed data. */
             var bos = new ByteArrayOutputStream(length);
-
-            Deflater compressor = SharpZipLib.CreateDeflater();
+            
+            Deflater compressor = null;// = SharpZipLib.CreateDeflater();
 
             try
             {
@@ -131,7 +131,7 @@ namespace Lucene.Net.Documents
             // Create an expandable byte array to hold the decompressed data
             var bos = new ByteArrayOutputStream(length);
 
-            Inflater decompressor = SharpZipLib.CreateInflater();
+            Inflater decompressor = null;// = SharpZipLib.CreateInflater();
 
             try
             {

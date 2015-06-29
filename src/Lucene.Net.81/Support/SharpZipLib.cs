@@ -19,33 +19,88 @@
  *
 */
 
+using Lucene.Net._81.Interfaces;
 using System.Reflection;
+using System;
 
 namespace Lucene.Net.Support
 {
-    public class SharpZipLib
+    public class SharpZipLib : IDeflater, IInflater
     {
         private static System.Reflection.Assembly asm = null;
 
-        static SharpZipLib()
+        public bool IsFinished
         {
-            try
+            get
             {
-                asm = Assembly.Load("ICSharpCode.SharpZipLib");
+                throw new NotImplementedException();
             }
-            catch { }
         }
 
-        public static Deflater CreateDeflater()
+        public bool NeedsInput
         {
-            if (asm == null) throw new System.IO.FileNotFoundException("Can not load ICSharpCode.SharpZipLib.dll");
-            return new Deflater(asm.CreateInstance("ICSharpCode.SharpZipLib.Zip.Compression.Deflater"));
+            get
+            {
+                throw new NotImplementedException();
+            }
         }
 
-        public static Inflater CreateInflater()
+        public int Deflate(byte[] output)
         {
-            if (asm == null) throw new System.IO.FileNotFoundException("Can not load ICSharpCode.SharpZipLib.dll");
-            return new Inflater(asm.CreateInstance("ICSharpCode.SharpZipLib.Zip.Compression.Inflater"));
+            throw new NotImplementedException();
         }
+
+        public int Deflate(byte[] output, int offset, int length)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Finish()
+        {
+            throw new NotImplementedException();
+        }
+
+        public int Inflate(byte[] buffer)
+        {
+            throw new NotImplementedException();
+        }
+
+        public int Inflate(byte[] buffer, int offset, int count)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Reset()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetInput(byte[] buffer)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetInput(byte[] input, int offset, int count)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetLevel(int level)
+        {
+            throw new NotImplementedException();
+        }
+
+
+        //public static Deflater CreateDeflater()
+        //{
+        //    if (asm == null) throw new System.IO.FileNotFoundException("Can not load ICSharpCode.SharpZipLib.dll");
+        //    return new Deflater(asm.CreateInstance("ICSharpCode.SharpZipLib.Zip.Compression.Deflater"));
+        //}
+
+        //public static Inflater CreateInflater()
+        //{
+        //    if (asm == null) throw new System.IO.FileNotFoundException("Can not load ICSharpCode.SharpZipLib.dll");
+        //    return new Inflater(asm.CreateInstance("ICSharpCode.SharpZipLib.Zip.Compression.Inflater"));
+        //}
     }
 }
