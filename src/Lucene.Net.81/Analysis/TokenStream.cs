@@ -119,7 +119,7 @@ namespace Lucene.Net.Analysis
             //if (!type.desiredAssertionStatus()) return true; // not supported in .NET
 
             var hasCompilerGeneratedAttribute =
-                type.GetCustomAttributes(typeof (CompilerGeneratedAttribute), false).Any();
+                type.GetTypeInfo().GetCustomAttributes(typeof (CompilerGeneratedAttribute), false).Any();
             var isAnonymousType = hasCompilerGeneratedAttribute && type.FullName.Contains("AnonymousType");
 
             var method = type.GetTypeInfo().DeclaredMethods.Where(x => x.IsPublic || x.Name.Equals("IncrementToken")).FirstOrDefault();

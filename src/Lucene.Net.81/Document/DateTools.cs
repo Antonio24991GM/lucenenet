@@ -1,5 +1,5 @@
 using System;
-using System.Globalization;
+using Windows.Globalization;
 using Lucene.Net.Search;
 using Lucene.Net.Util;
 
@@ -53,7 +53,14 @@ namespace Lucene.Net.Documents
         private static readonly String SECOND_FORMAT = "yyyyMMddHHmmss";
         private static readonly String MILLISECOND_FORMAT = "yyyyMMddHHmmssfff";
 
-        private static readonly System.Globalization.Calendar calInstance = new System.Globalization.GregorianCalendar();
+        private static readonly Calendar calInstance = CreateGregorian();
+
+        public static Calendar CreateGregorian()
+        {
+            Calendar cal = new Calendar();
+            cal.ChangeCalendarSystem("Gregorian");
+            return cal;
+        }
 
         /// <summary>
         /// Converts a Date to a string suitable for indexing.
