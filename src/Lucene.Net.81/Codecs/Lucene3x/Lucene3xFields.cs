@@ -785,7 +785,7 @@ namespace Lucene.Net.Codecs.Lucene3x
             {
                 //System.out.println("pff.reset te=" + termEnum);
                 this.fieldInfo = fieldInfo;
-                InternedFieldName = String.Intern(fieldInfo.Name);
+                InternedFieldName = fieldInfo.Name;
                 Term term = new Term(InternedFieldName);
                 if (TermEnum == null)
                 {
