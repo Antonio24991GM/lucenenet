@@ -19,6 +19,7 @@
  *
 */
 
+using Lucene.Net._81.Collections;
 using System;
 using System.Collections;
 using System.Collections.Generic;
