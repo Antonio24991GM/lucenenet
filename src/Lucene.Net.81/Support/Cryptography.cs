@@ -27,7 +27,7 @@ namespace Lucene.Net.Support
     {
         public static bool FIPSCompliant = false;
 
-        public static HashAlgorithm HashAlgorithm
+        public static bool HashAlgorithm
         {
             get
             {

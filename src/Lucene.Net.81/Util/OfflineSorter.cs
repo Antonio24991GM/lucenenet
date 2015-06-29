@@ -527,7 +527,7 @@ namespace Lucene.Net.Util
             /// <summary>
             /// Constructs a ByteSequencesWriter to the provided File </summary>
             public ByteSequencesWriter(string filePath)
-                : this(new BinaryWriterDataOutput(new BinaryWriter(new FileStream(filePath, FileMode.Open))))
+                : this(new BinaryWriterDataOutput(new BinaryWriter(Constants.GetStream(filePath))))
             {
             }
 

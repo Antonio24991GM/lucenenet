@@ -20,6 +20,7 @@
 */
 
 using System;
+using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -101,7 +102,7 @@ namespace Lucene.Net.Support
             _dict = wrappedDict;
             _hasNullValue = false;
 
-            if (typeof(TKey).IsValueType)
+            if (typeof(TKey).GetTypeInfo().IsValueType)
             {
                 _isValueType = Nullable.GetUnderlyingType(typeof(TKey)) == null;
             }

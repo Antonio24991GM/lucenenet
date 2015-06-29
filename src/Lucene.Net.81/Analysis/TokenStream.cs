@@ -122,9 +122,10 @@ namespace Lucene.Net.Analysis
                 type.GetCustomAttributes(typeof (CompilerGeneratedAttribute), false).Any();
             var isAnonymousType = hasCompilerGeneratedAttribute && type.FullName.Contains("AnonymousType");
 
-            var method = type.GetMethod("IncrementToken", BindingFlags.Public | BindingFlags.Instance);
+            var method = type.GetTypeInfo().DeclaredMethods.Where(x => x.IsPublic || x.Name.Equals("IncrementToken")).FirstOrDefault();
+                //GetMethod("IncrementToken", BindingFlags.Public | BindingFlags.Instance);
 
-            if (!(isAnonymousType || type.IsSealed || (method != null && method.IsFinal)))            
+            if (!(isAnonymousType || type.GetTypeInfo().IsSealed || (method != null && method.IsFinal)))            
             {
                 // Original Java code throws an AssertException via Java's assert, we can't do this here
                 throw new InvalidOperationException("TokenStream implementation classes or at least their IncrementToken() implementation must be marked sealed");

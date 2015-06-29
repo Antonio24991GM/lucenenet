@@ -246,7 +246,7 @@ namespace Lucene.Net.Store
             ReadBytes(bytes, 0, length);
 
             //return new string(bytes, 0, length, IOUtils.CHARSET_UTF_8);
-            return IOUtils.CHARSET_UTF_8.GetString((byte[])(Array)bytes);
+            return IOUtils.CHARSET_UTF_8.GetString((byte[])(Array)bytes, 0, bytes.Length);
         }
 
         /// <summary>

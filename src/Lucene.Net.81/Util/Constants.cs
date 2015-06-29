@@ -1,5 +1,7 @@
 using Lucene.Net.Support;
 using System;
+using System.IO;
+using System.Reflection;
 
 namespace Lucene.Net.Util
 {
@@ -92,7 +94,8 @@ namespace Lucene.Net.Util
 
             try
             {
-                LUCENE_VERSION = System.Reflection.Assembly .GetExecutingAssembly().GetName().Version.ToString();
+                LUCENE_VERSION = typeof(Constants).GetTypeInfo().Assembly.GetName().Version.ToString();
+                //LUCENE_VERSION = System.Reflection.Assembly.Load(new System.Reflection.AssemblyName("")).GetName().Version.ToString();//GetExecutingAssembly().GetName().Version.ToString();
             }
             catch (System.Security.SecurityException) //Ignore in medium trust.
             {
@@ -178,7 +181,8 @@ namespace Lucene.Net.Util
         /// </summary>
         public static string MainVersionWithoutAlphaBeta()
         {
-            string[] parts = LUCENE_MAIN_VERSION.Split("\\.", true);
+            string[] parts = LUCENE_MAIN_VERSION.Split("\\.".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+                //("\\.", true);
             if (parts.Length == 4 && "0".Equals(parts[2]))
             {
                 return parts[0] + "." + parts[1];
@@ -192,14 +196,23 @@ namespace Lucene.Net.Util
         {
             try
             {
-                if (variable == "OS_VERSION") return System.Environment.OSVersion.ToString();
+                if (variable == "OS_VERSION") return "Windows";
 
-                return System.Environment.GetEnvironmentVariable(variable);
+                return "Windows";
             }
             catch (System.Security.SecurityException)
             {
                 return defaultValueOnSecurityException;
             }
+        }
+
+        public static Stream GetStream(string filePath)
+        {
+            var tfile = Windows.Storage.StorageFile.GetFileFromPathAsync(filePath).AsTask();
+            tfile.Wait();
+            var tirs = tfile.Result.OpenAsync(Windows.Storage.FileAccessMode.ReadWrite).AsTask();
+            tirs.Wait();
+            return tirs.Result.AsStream(); 
         }
 
         #endregion MEDIUM-TRUST Support
