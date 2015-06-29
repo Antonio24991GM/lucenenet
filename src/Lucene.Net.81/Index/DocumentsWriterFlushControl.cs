@@ -53,7 +53,7 @@ namespace Lucene.Net.Index
 
         // only for safety reasons if a DWPT is close to the RAM limit
         private readonly LinkedList<BlockedFlush> BlockedFlushes = new LinkedList<BlockedFlush>();
-
+        
         private readonly IdentityHashMap<DocumentsWriterPerThread, long?> FlushingWriters = new IdentityHashMap<DocumentsWriterPerThread, long?>();
 
         internal double MaxConfiguredRamBuffer = 0;
@@ -902,6 +902,32 @@ namespace Lucene.Net.Index
             get
             {
                 return InfoStream_Renamed;
+            }
+        }
+
+        internal ThreadState ObtainAndLock()
+        {
+            ThreadState perThread = PerThreadPool.GetAndLock(Task.Run(() => Task.CurrentId), DocumentsWriter);
+            bool success = false;
+            try
+            {
+                if (perThread.Initialized && perThread.Dwpt.DeleteQueue != DocumentsWriter.DeleteQueue)
+                {
+                    // There is a flush-all in process and this DWPT is
+                    // now stale -- enroll it for flush and try for
+                    // another DWPT:
+                    AddFlushableState(perThread);
+                }
+                success = true;
+                // simply return the ThreadState even in a flush all case sine we already hold the lock
+                return perThread;
+            }
+            finally
+            {
+                if (!success) // make sure we unlock if this fails
+                {
+                    perThread.Unlock();
+                }
             }
         }
     }

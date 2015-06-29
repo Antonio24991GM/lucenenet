@@ -170,7 +170,8 @@ namespace Lucene.Net.Index
                 {
                     FieldsReaderOrig = sff.FieldsReader(cfsDir, si.Info, fieldInfos, context);
                 }
-                catch (System.AccessViolationException ave)
+                //doubt
+                catch (Exception)
                 {
                 }
 

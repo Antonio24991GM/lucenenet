@@ -156,7 +156,7 @@ namespace Lucene.Net.Index
                 }
             }
         }
-
+        public abstract ThreadState GetAndLock(Task requestingThread, DocumentsWriter documentsWriter);
         private ThreadState[] ThreadStates;
         private volatile int NumThreadStatesActive;
 
