@@ -209,7 +209,7 @@ namespace Lucene.Net.Codecs.Compressing
 
             internal DeflateDecompressor()
             {
-                decompressor = SharpZipLib.CreateInflater();
+                //decompressor = SharpZipLib;
                 Compressed = new byte[0];
             }
 
@@ -275,7 +275,7 @@ namespace Lucene.Net.Codecs.Compressing
 
             internal DeflateCompressor(int level)
             {
-                Compressor = SharpZipLib.CreateDeflater();
+                //Compressor = SharpZipLib.CreateDeflater();
                 Compressed = new byte[64];
             }
 
@@ -294,7 +294,7 @@ namespace Lucene.Net.Codecs.Compressing
                 }
 
                 int totalCount = 0;
-                for (; ; )
+                for (; ;)
                 {
                     int count = Compressor.Deflate(Compressed, totalCount, Compressed.Length - totalCount);
                     totalCount += count;
